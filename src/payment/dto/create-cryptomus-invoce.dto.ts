@@ -11,9 +11,7 @@ export class CreateCryptomusInvoiceDto {
   @ApiProperty({
     description: 'Invoice amount in decimal format',
     example: '12.34',
-    minimum: 0.1,
   })
-  @Min(0.1)
   @IsDecimal(
     { decimal_digits: '1,2' },
     {

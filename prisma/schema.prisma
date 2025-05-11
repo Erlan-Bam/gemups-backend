@@ -17,6 +17,19 @@ enum Role {
   User
   Admin
 }
+enum PaymentStatus {
+  pending
+  confirm_check
+  paid
+  paid_over
+  fail
+  wrong_amount
+  cancel
+  system_fail
+  refund_process
+  refund_fail
+  refund_paid
+}
 
 model User {
   id            String    @id @default(uuid())
@@ -29,11 +42,12 @@ model User {
 }
 
 model Payment {
-  id            Int       @id @default(autoincrement())
+  id            Int              @id @default(autoincrement())
   user_id       String
   order_id      String
   amount        Decimal
-  created_at    DateTime  @default(now())
-  updated_at    DateTime  @updatedAt 
+  status        PaymentStatus    @default(pending)
+  created_at    DateTime         @default(now())
+  updated_at    DateTime         @updatedAt 
   @@unique([user_id, order_id])
 }
