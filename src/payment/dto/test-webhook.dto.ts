@@ -46,15 +46,9 @@ export class TestWebhookDto {
     description: 'Order ID in your system',
     example: 'abc_123-test',
     minLength: 1,
-    maxLength: 32,
   })
   @IsOptional()
   @IsString()
-  @Length(1, 32)
-  @Matches(/^[a-zA-Z0-9_-]+$/, {
-    message:
-      'order_id must contain only letters, numbers, dashes, or underscores',
-  })
   order_id?: string;
 
   @ApiProperty({
