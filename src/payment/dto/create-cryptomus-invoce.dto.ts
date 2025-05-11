@@ -20,11 +20,4 @@ export class CreateCryptomusInvoiceDto {
     },
   )
   amount: string;
-
-  @ApiProperty({
-    description: 'Unique identifier of the order (UUID)',
-    example: '9d1a9bfa-3140-4b8f-b1a5-e9c3e9d7b2d6',
-  })
-  @IsUUID()
-  order_id: string;
 }

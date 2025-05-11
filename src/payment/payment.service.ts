@@ -45,7 +45,7 @@ export class PaymentService {
     const payload = {
       amount: data.amount,
       currency: 'USD',
-      order_id: `${data.user_id}_${data.order_id}_${Date.now()}`,
+      order_id: `${data.user_id}_${Date.now()}`,
       url_return: this.baseFrontendURL,
       url_success: this.baseFrontendURL,
       url_callback: `${this.baseBackendURL}/api/payment/cryptomus/webhook`,
@@ -73,13 +73,10 @@ export class PaymentService {
     if (!isValid) {
       throw new HttpException('Invalid signature', 400);
     }
-    const [userId, orderId, _] = data.order_id.split('_');
+    const [userId, _] = data.order_id.split('_');
     const payment = await this.prisma.payment.findUnique({
       where: {
-        user_id_order_id: {
-          user_id: userId,
-          order_id: orderId,
-        },
+        cryptomus_order_id: data.uuid,
       },
     });
     if (!payment) {
@@ -88,16 +85,13 @@ export class PaymentService {
           amount: data.amount,
           status: data.status,
           user_id: userId,
-          order_id: orderId,
+          cryptomus_order_id: data.uuid,
         },
       });
     } else {
       await this.prisma.payment.update({
         where: {
-          user_id_order_id: {
-            user_id: userId,
-            order_id: orderId,
-          },
+          cryptomus_order_id: data.uuid,
         },
         data: {
           status: data.status,

@@ -42,12 +42,11 @@ model User {
 }
 
 model Payment {
-  id            Int              @id @default(autoincrement())
-  user_id       String
-  order_id      String
-  amount        Decimal
-  status        PaymentStatus    @default(pending)
-  created_at    DateTime         @default(now())
-  updated_at    DateTime         @updatedAt 
-  @@unique([user_id, order_id])
+  id                 Int              @id @default(autoincrement())
+  user_id            String
+  amount             Decimal
+  cryptomus_order_id String           @unique
+  status             PaymentStatus    @default(pending)
+  created_at         DateTime         @default(now())
+  updated_at         DateTime         @updatedAt
 }
