@@ -21,6 +21,7 @@ import {
   ApiBody,
   ApiConsumes,
   ApiOperation,
+  ApiParam,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -75,7 +76,7 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'), AdminGuard)
   @ApiOperation({ summary: 'Ban a user by ID' })
   @ApiResponse({ status: 200, description: 'User banned successfully' })
-  async banUser(@Param('id', ParseIntPipe) id: number) {
+  async banUser(@Param('id') id: string) {
     return this.userService.banUser(id);
   }
 
@@ -83,7 +84,7 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'), AdminGuard)
   @ApiOperation({ summary: 'Unban a user by ID' })
   @ApiResponse({ status: 200, description: 'User unbanned successfully' })
-  async unbanUser(@Param('id', ParseIntPipe) id: number) {
+  async unbanUser(@Param('id') id: string) {
     return this.userService.unbanUser(id);
   }
 
@@ -111,9 +112,15 @@ export class UserController {
   @Get(':id')
   @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Get user by ID' })
-  @ApiResponse({ status: 200, description: 'User data returned successfully' })
-  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiParam({
+    name: 'id',
+    description: 'UUID of user you want to get',
+    schema: {
+      type: 'string',
+      example: '123e4567-e89b-12d3-a456-426614174000',
+    },
+  })
   async getUserById(@Param('id') id: string) {
-    return this.userService.findById(Number(id));
+    return this.userService.findById(id);
   }
 }

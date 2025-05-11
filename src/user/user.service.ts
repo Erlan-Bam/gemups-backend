@@ -19,7 +19,7 @@ export class UserService {
     });
   }
 
-  async findById(id: number): Promise<User> {
+  async findById(id: string): Promise<User> {
     const user = await this.prisma.user.findUnique({ where: { id: id } });
     if (!user) {
       throw new HttpException('User not found', 404);
@@ -57,7 +57,7 @@ export class UserService {
       where: { email: email },
     });
   }
-  async updateProfile(id: number, data: UpdateProfileDto) {
+  async updateProfile(id: string, data: UpdateProfileDto) {
     const user = await this.prisma.user.findUnique({ where: { id: id } });
     if (!user) {
       throw new HttpException('User not found', 404);
@@ -95,7 +95,7 @@ export class UserService {
     };
   }
 
-  async banUser(userId: number) {
+  async banUser(userId: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
       throw new HttpException('User not found', 404);
@@ -109,7 +109,7 @@ export class UserService {
     });
   }
 
-  async unbanUser(userId: number) {
+  async unbanUser(userId: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
       throw new HttpException('User not found', 404);

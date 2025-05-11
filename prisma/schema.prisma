@@ -19,10 +19,21 @@ enum Role {
 }
 
 model User {
-  id            Int       @id @default(autoincrement())
-  email         String?    @unique
+  id            String    @id @default(uuid())
+  balance       Decimal   @default(0)
+  email         String?   @unique
   password      String?
   username      String?
   role          Role      @default(User)
   is_banned     Boolean   @default(false)
+}
+
+model Payment {
+  id            Int       @id @default(autoincrement())
+  user_id       String
+  order_id      String
+  amount        Decimal
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt 
+  @@unique([user_id, order_id])
 }
