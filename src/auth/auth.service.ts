@@ -19,7 +19,7 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
   async register(data: RegisterDto) {
-    let user = await this.userService.findByIdentifier(data.identifier);
+    let user = await this.userService.findByEmail(data.email);
     if (user) {
       throw new HttpException('User with such credentials already exists', 400);
     }
@@ -37,7 +37,7 @@ export class AuthService {
     };
   }
   async login(data: LoginDto) {
-    const user = await this.userService.findByIdentifier(data.identifier);
+    const user = await this.userService.findByEmail(data.email);
     if (!user) {
       throw new HttpException('Invalid credentials', 400);
     }
@@ -61,31 +61,8 @@ export class AuthService {
       refresh_token: refreshToken,
     };
   }
-  async validateOAuth(profile: any) {
-    let user = await this.prisma.user.findUnique({
-      where: { identifier: profile.email },
-    });
-    if (!user) {
-      user = await this.prisma.user.create({
-        data: {
-          identifier: profile.email,
-          password: '',
-        },
-      });
-    }
-
-    const [accessToken, refreshToken] = await Promise.all([
-      this.generateAccessToken(user),
-      this.generateRefreshToken(user),
-    ]);
-
-    return {
-      access_token: accessToken,
-      refresh_token: refreshToken,
-    };
-  }
   async changePassword(data: ChangePasswordDto) {
-    const user = await this.userService.findByIdentifier(data.email);
+    const user = await this.userService.findByEmail(data.email);
 
     if (!user) {
       throw new HttpException('User not found', 404);
@@ -102,7 +79,7 @@ export class AuthService {
     return await this.jwtService.signAsync(
       {
         id: user.id,
-        identifier: user.identifier,
+        email: user.email,
         role: user.role,
         is_banned: user.is_banned,
       },
@@ -116,7 +93,7 @@ export class AuthService {
     return await this.jwtService.signAsync(
       {
         id: user.id,
-        identifier: user.identifier,
+        email: user.email,
         role: user.role,
         is_banned: user.is_banned,
       },
@@ -131,7 +108,7 @@ export class AuthService {
       const payload = await this.jwtService.verifyAsync(refreshToken, {
         secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
       });
-      const user = await this.userService.findByIdentifier(payload.email);
+      const user = await this.userService.findByEmail(payload.email);
       if (!user) {
         throw new HttpException('Invalid refresh token', 401);
       }

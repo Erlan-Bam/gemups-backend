@@ -44,7 +44,7 @@ export class AuthController {
   }
 
   @Post('register')
-  @ApiOperation({ summary: 'Register user with email or phone and password' })
+  @ApiOperation({ summary: 'Register user with email and password' })
   @ApiBody({ type: RegisterDto })
   @ApiResponse({ status: 201, description: 'Tokens issued after registration' })
   async register(@Body() data: RegisterDto) {
@@ -79,25 +79,5 @@ export class AuthController {
   @Post('change-password')
   async changePassword(@Body() data: ChangePasswordDto) {
     return await this.authService.changePassword(data);
-  }
-
-  @Get('google')
-  @UseGuards(AuthGuard('google'))
-  @ApiOperation({ summary: 'Initiate Google OAuth login' })
-  async googleAuth() {}
-
-  @Get('google/callback')
-  @UseGuards(AuthGuard('google'))
-  @ApiOperation({ summary: 'Google OAuth callback' })
-  async googleAuthRedirect(@Request() request, @Response() response) {
-    try {
-      const tokens = await this.authService.validateOAuth(request.user);
-      return response.redirect(
-        `${this.baseFrontendUrl}/google?access=${tokens.access_token}&refresh=${tokens.refresh_token}`,
-      );
-    } catch (error) {
-      console.log(error);
-      return response.redirect(`${this.baseFrontendUrl}/register`);
-    }
   }
 }

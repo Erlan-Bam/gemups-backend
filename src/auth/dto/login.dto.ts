@@ -1,14 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
-import { IsEmailOrPhone } from './register.dto';
+import { IsEmail, IsString } from 'class-validator';
 
 export class LoginDto {
   @ApiProperty({
-    description: 'Email or phone number in E.164 format',
-    example: 'user@example.com or +77001112233',
+    description: 'User email',
+    example: 'user@example.com',
   })
-  @IsEmailOrPhone()
-  identifier: string;
+  @IsEmail()
+  email: string;
 
   @ApiProperty({
     description: 'User password',

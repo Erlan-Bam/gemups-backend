@@ -13,7 +13,7 @@ export class UserService {
     const hashedPassword = await bcrypt.hash(data.password, 10);
     return await this.prisma.user.create({
       data: {
-        identifier: data.identifier,
+        email: data.email,
         password: hashedPassword,
       },
     });
@@ -29,7 +29,7 @@ export class UserService {
 
   async resetPassword(data: ResetPasswordDto) {
     const user = await this.prisma.user.findUnique({
-      where: { identifier: data.identifier },
+      where: { email: data.email },
     });
     if (!user) {
       throw new HttpException('User not found', 404);
@@ -41,49 +41,28 @@ export class UserService {
     }
     const hashedPassword = await bcrypt.hash(data.new_password, 10);
     return await this.prisma.user.update({
-      where: { identifier: data.identifier },
+      where: { email: data.email },
       data: {
         password: hashedPassword,
       },
       select: {
         id: true,
-        identifier: true,
+        email: true,
         role: true,
       },
     });
   }
-  async updateProfile(data: Partial<UpdateProfileDto>) {
-    const user = await this.prisma.user.findUnique({ where: { id: data.id } });
-
+  async findByEmail(email: string): Promise<User> {
+    return await this.prisma.user.findUnique({
+      where: { email: email },
+    });
+  }
+  async updateProfile(id: number, data: UpdateProfileDto) {
+    const user = await this.prisma.user.findUnique({ where: { id: id } });
     if (!user) {
       throw new HttpException('User not found', 404);
     }
-
-    if (user.avatar) {
-      try {
-        const { unlink } = await import('fs/promises');
-        const { join } = await import('path');
-
-        const filename = user.avatar.split('/').pop();
-        const filePath = join(process.cwd(), 'uploads', 'avatars', filename);
-
-        await unlink(filePath);
-      } catch (err) {}
-    }
-
-    return await this.prisma.user.update({
-      where: { id: data.id },
-      data: {
-        first_name: data.first_name,
-        last_name: data.last_name,
-        avatar: data.avatar,
-      },
-    });
-  }
-  async findByIdentifier(identifier: string): Promise<User> {
-    return await this.prisma.user.findUnique({
-      where: { identifier: identifier },
-    });
+    return await this.prisma.user.update({ where: { id: id }, data: data });
   }
 
   async findAllUsers(query: {
@@ -95,11 +74,7 @@ export class UserService {
 
     const where: Prisma.UserWhereInput = search
       ? {
-          OR: [
-            { first_name: { contains: search, mode: 'insensitive' } },
-            { last_name: { contains: search, mode: 'insensitive' } },
-            { identifier: { contains: search, mode: 'insensitive' } },
-          ],
+          OR: [{ email: { contains: search, mode: 'insensitive' } }],
         }
       : {};
 

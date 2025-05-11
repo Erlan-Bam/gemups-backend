@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsOptional, IsString } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class ResetPasswordDto {
@@ -8,5 +8,6 @@ export class ResetPasswordDto {
 
   @ApiPropertyOptional()
   @IsOptional()
-  identifier: string;
+  @IsEmail()
+  email: string;
 }
