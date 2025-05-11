@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsUUID, IsEnum } from 'class-validator';
+import { IsString, IsNumber, IsUUID, IsEnum, IsDecimal } from 'class-validator';
 import { PaymentStatus } from '@prisma/client';
 
 export class CryptomusWebhookDto {
@@ -8,10 +8,10 @@ export class CryptomusWebhookDto {
   @IsString()
   order_id: string;
 
-  @IsNumber()
+  @IsDecimal()
   amount: number;
 
-  @IsString()
+  @IsDecimal()
   payment_amount_usd: string;
 
   @IsEnum(PaymentStatus)
