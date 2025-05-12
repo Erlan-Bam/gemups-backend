@@ -17,7 +17,9 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
   app.enableCors({
-    origin: '*',
+    origin: [
+      'https://gemup-frontend.vercel.app',
+    ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: [
       'Content-Type',
@@ -28,6 +30,7 @@ async function bootstrap() {
     ],
     exposedHeaders: ['Authorization'],
   });
+  
 
   const config = new DocumentBuilder()
     .setTitle('Auth API')
