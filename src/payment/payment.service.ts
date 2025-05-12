@@ -69,7 +69,6 @@ export class PaymentService {
 
   async cryptomusWebhook(data: CryptomusWebhookDto) {
     const isValid = await this.verifyCryptomusSignature(data);
-    console.log(isValid);
     if (!isValid) {
       throw new HttpException('Invalid signature', 400);
     }
@@ -151,7 +150,6 @@ export class PaymentService {
         status: 'ok',
       };
     } catch (error) {
-      console.log(error.response.data);
       throw new HttpException('Invalid amount or order id', 400);
     }
   }

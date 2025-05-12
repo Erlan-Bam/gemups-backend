@@ -30,15 +30,94 @@ enum PaymentStatus {
   refund_fail
   refund_paid
 }
+enum ProductType {
+  resident
+  isp
+  ipv4
+}
+enum Period {
+  month
+  three_months
+  six_months
+}
+enum Provider {
+  SevenOneOne
+  ProxySeller
+  GoProxy
+}
+enum OrderStatus {
+  pending
+  executed
+  failed
+}
 
 model User {
-  id            String    @id @default(uuid())
-  balance       Decimal   @default(0)
-  email         String?   @unique
-  password      String?
-  username      String?
-  role          Role      @default(User)
-  is_banned     Boolean   @default(false)
+  id        String   @id @default(uuid())
+  balance   Decimal  @default(0)
+  email     String?  @unique
+  password  String?
+  username  String?
+  role      Role     @default(User)
+  is_banned Boolean  @default(false)
+
+  cart      Cart?
+  orders    Order[]
+}
+
+model Product {
+  id       Int          @id @default(autoincrement())
+  traffic  String
+  price    Decimal
+  type     ProductType
+  provider Provider
+  period   Period       @default(month)
+
+  cart_items CartItem[]
+  order_items OrderItem[]
+}
+
+model Cart {
+  id       Int       @id @default(autoincrement())
+  user_id  String    @unique
+
+  items    CartItem[]
+  user     User      @relation(fields: [user_id], references: [id])
+}
+
+model CartItem {
+  id         Int      @id @default(autoincrement())
+  cart_id    Int
+  product_id Int
+  quantity   Int
+
+  cart       Cart     @relation(fields: [cart_id], references: [id])
+  product    Product  @relation(fields: [product_id], references: [id])
+  @@unique([cart_id, product_id])
+}
+
+model Order {
+  id          String       @id @default(uuid())
+  user_id     String
+  price       Decimal
+  created_at  DateTime     @default(now())
+  updated_at  DateTime     @updatedAt
+
+  items       OrderItem[]
+  user        User         @relation(fields: [user_id], references: [id])
+}
+
+model OrderItem {
+  id          Int          @id @default(autoincrement())
+  order_id    String
+  product_id  Int
+  quantity    Int
+  price       Decimal
+  external_id String?      @unique
+  status      OrderStatus  @default(pending)
+  
+  order       Order    @relation(fields: [order_id], references: [id])
+  product     Product  @relation(fields: [product_id], references: [id])
+  @@unique([order_id, product_id])
 }
 
 model Payment {

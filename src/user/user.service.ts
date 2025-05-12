@@ -11,12 +11,24 @@ export class UserService {
   async createUser(data: RegisterDto) {
     const bcrypt = await import('bcryptjs');
     const hashedPassword = await bcrypt.hash(data.password, 10);
-    return await this.prisma.user.create({
-      data: {
-        email: data.email,
-        password: hashedPassword,
-      },
+    const result = await this.prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          email: data.email,
+          password: hashedPassword,
+        },
+      });
+
+      await tx.cart.create({
+        data: {
+          user_id: user.id,
+        },
+      });
+
+      return user;
     });
+
+    return result;
   }
 
   async findById(id: string): Promise<User> {

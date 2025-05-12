@@ -35,7 +35,6 @@ export class PaymentController {
   @Post('cryptomus/webhook')
   @ApiOperation({ summary: 'Cryptomus payment webhook (internal)' })
   async cryptomusWebhook(@Body() data: CryptomusWebhookDto) {
-    console.log(data);
     return await this.paymentService.cryptomusWebhook(data);
   }
 
