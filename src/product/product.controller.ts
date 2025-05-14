@@ -28,12 +28,15 @@ export class ProductController {
 
   @Get()
   async findAll(
-    @Query('page', ParseIntPipe) page = 1,
-    @Query('limit', ParseIntPipe) limit = 10,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
   ) {
-    return await this.productService.findAll(page, limit);
+    const pageNum = parseInt(page || '1', 10);
+    const limitNum = parseInt(limit || '10', 10);
+  
+    return this.productService.findAll(pageNum, limitNum);
   }
-
+  
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
     return await this.productService.findOne(id);
