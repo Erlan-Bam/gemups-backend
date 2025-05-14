@@ -24,7 +24,7 @@ export class OrderController {
     return await this.orderService.create(request.user.id);
   }
 
-  @Post('finish/:id')
+  @Post('finish')
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Finish an order by ID for the authorized user' })
