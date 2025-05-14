@@ -2,6 +2,7 @@ import {
   Controller,
   Post,
   Delete,
+  Get,
   Body,
   UseGuards,
   Request,
@@ -27,5 +28,12 @@ export class CartController {
   async removeItem(@Body() data: RemoveFromCartDto, @Request() request) {
     data.user_id = request.user.id;
     return await this.cartService.removeItem(data);
+  }
+
+  @Get()
+  @UseGuards(AuthGuard('jwt'))
+  async getCart(@Request() request) {
+    const userId = request.user.id;
+    return await this.cartService.getCart(userId);
   }
 }

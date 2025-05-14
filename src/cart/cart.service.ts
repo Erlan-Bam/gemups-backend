@@ -1,7 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { AddToCartDto } from './dto/add-to-cart.dto';
-import { PrismaService } from 'src/shared/services/prisma.service';
 import { RemoveFromCartDto } from './dto/remove-from-cart.dto';
+import { PrismaService } from 'src/shared/services/prisma.service';
 
 @Injectable()
 export class CartService {
@@ -84,6 +84,7 @@ export class CartService {
     if (!item) {
       throw new HttpException('Item not found in cart', 404);
     }
+
     const remaining = Math.max(item.quantity - data.quantity, 0);
     if (!remaining) {
       return await this.prisma.cartItem.delete({ where: { id: item.id } });
@@ -93,5 +94,22 @@ export class CartService {
         data: { quantity: remaining },
       });
     }
+  }
+
+  async getCart(userId: string) {
+    const cart = await this.prisma.cart.findUnique({
+      where: { user_id: userId },
+    });
+
+    if (!cart) {
+      throw new HttpException('Cart not found', 404);
+    }
+
+    return await this.prisma.cartItem.findMany({
+      where: { cart_id: cart.id },
+      include: {
+        product: true,
+      },
+    });
   }
 }
