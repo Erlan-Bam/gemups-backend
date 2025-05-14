@@ -7,6 +7,7 @@ export class AddToCartDto {
 
   @Type(() => Number)
   @IsInt()
+  @Type(()=> Number)
   product_id: number;
 
   @IsInt()
