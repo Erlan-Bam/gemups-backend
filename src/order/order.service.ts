@@ -95,7 +95,14 @@ export class OrderService {
             }),
             this.prisma.orderItem.update({
               where: { id: item.id },
-              data: { status: OrderStatus.executed },
+              data: {
+                status: OrderStatus.executed,
+                external_data: JSON.stringify({
+                  order_no: result.order_no,
+                  username: result.username,
+                  passwd: result.passwd,
+                }),
+              },
             }),
           ]);
         } else {

@@ -107,13 +107,13 @@ model Order {
 }
 
 model OrderItem {
-  id          Int          @id @default(autoincrement())
-  order_id    String
-  product_id  Int
-  quantity    Int
-  price       Decimal
-  external_id String?      @unique
-  status      OrderStatus  @default(pending)
+  id            Int          @id @default(autoincrement())
+  order_id      String
+  product_id    Int
+  quantity      Int
+  price         Decimal
+  external_data String?
+  status        OrderStatus  @default(pending)
   
   order       Order    @relation(fields: [order_id], references: [id])
   product     Product  @relation(fields: [product_id], references: [id])
