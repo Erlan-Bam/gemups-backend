@@ -16,7 +16,7 @@ export class CreateProductDto {
     description: 'Product price as decimal string',
   })
   @IsDecimal()
-  price: any;
+  price: string;
 
   @ApiProperty({ enum: Provider, description: 'Provider of the product' })
   @IsEnum(Provider)
