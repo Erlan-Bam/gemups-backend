@@ -83,13 +83,44 @@ export class SevenOneOneService {
       un_status: data.un_status,
     };
   }
-  async prolong(data: ProlongProxyDto) {
+  async prolong(data: ProlongProxyDto): Promise<GetProxyRdo> {
     const expire = await this.convertPeriod(data.period);
     const flow = await this.convertToBytes(data.traffic, data.quantity);
     const response = await this.sevenoneone.post('/eapi/order/allocate', {
       expire: expire.toISOString(),
       flow: flow,
     });
+
+    if (response.data.error) {
+      return {
+        status: 'error',
+        code: response.data.code,
+        msg: response.data.msg,
+        error: response.data.error,
+      };
+    }
+
+    return {
+      status: 'success',
+      code: response.data.code,
+      msg: response.data.msg,
+      error: response.data.error,
+      username: response.data.username,
+      passwd: response.data.passwd,
+      host: response.data.host,
+      port: response.data.port,
+      proto: response.data.proto,
+      expire: response.data.expire,
+      un: response.data.un,
+      order_flow: response.data.order_flow,
+      order_flow_after: response.data.order_flow_after,
+      order_flow_befor: response.data.order_flow_befor,
+      order_no: response.data.order_no,
+      restitution_no: response.data.restitution_no,
+      un_flow: response.data.un_flow,
+      un_flow_used: response.data.un_flow_used,
+      un_status: response.data.un_status,
+    };
   }
   async convertToBytes(traffic: string, quantity: number): Promise<number> {
     const regex = /^(\d+(?:\.\d+)?)\s*(KB|MB|GB|TB)$/i;
