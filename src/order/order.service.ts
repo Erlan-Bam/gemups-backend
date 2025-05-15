@@ -58,6 +58,16 @@ export class OrderService {
   }
 
   async finish(data: FinishOrderDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: data.user_id },
+      select: {
+        id: true,
+        balance: true,
+      },
+    });
+    if (!user) {
+      throw new HttpException('User not found', 404);
+    }
     const order = await this.prisma.order.findUnique({
       where: { id: data.order_id, user_id: data.user_id },
       include: {
@@ -72,10 +82,6 @@ export class OrderService {
     if (!order) {
       throw new HttpException('Order not found', 404);
     }
-
-    const user = await this.prisma.user.findUnique({
-      where: { id: data.user_id },
-    });
     if (user.balance.lessThan(order.price)) {
       throw new HttpException('Insufficient balance', 400);
     }

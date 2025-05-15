@@ -99,11 +99,10 @@ export class CartService {
   async getCart(userId: string) {
     const cart = await this.prisma.cart.findUnique({
       where: { user_id: userId },
-      select: {
+      include: {
         items: {
-          select: {
+          include: {
             product: true,
-            quantity: true,
           },
         },
       },
