@@ -99,17 +99,20 @@ export class CartService {
   async getCart(userId: string) {
     const cart = await this.prisma.cart.findUnique({
       where: { user_id: userId },
+      select: {
+        items: {
+          select: {
+            product: true,
+            quantity: true,
+          },
+        },
+      },
     });
 
     if (!cart) {
       throw new HttpException('Cart not found', 404);
     }
 
-    return await this.prisma.cartItem.findMany({
-      where: { cart_id: cart.id },
-      include: {
-        product: true,
-      },
-    });
+    return cart;
   }
 }
