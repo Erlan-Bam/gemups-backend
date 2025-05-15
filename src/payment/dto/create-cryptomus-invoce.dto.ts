@@ -1,11 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDecimal, IsOptional, IsUUID, Min } from 'class-validator';
+import { IsDecimal, IsUUID } from 'class-validator';
 
 export class CreateCryptomusInvoiceDto {
-  @IsOptional({
-    message:
-      'User id comes from parsing JWT, you do not need to include this value in body',
+  @ApiProperty({
+    description: 'User ID (UUID format)',
+    example: 'f3bb7763-46d0-4610-bb8c-edbb1f4a2cbc',
   })
+  @IsUUID()
   user_id: string;
 
   @ApiProperty({

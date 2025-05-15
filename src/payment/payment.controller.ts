@@ -20,15 +20,9 @@ export class PaymentController {
   constructor(private paymentService: PaymentService) {}
 
   @Post('cryptomus/invoice')
-  @UseGuards(AuthGuard('jwt'))
-  @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Create a Cryptomus invoice' })
   @ApiBody({ type: CreateCryptomusInvoiceDto })
-  async createCryptomusInvoice(
-    @Body() data: CreateCryptomusInvoiceDto,
-    @Request() request,
-  ) {
-    data.user_id = request.user.id;
+  async createCryptomusInvoice(@Body() data: CreateCryptomusInvoiceDto) {
     return await this.paymentService.createCryptomusInvoice(data);
   }
 

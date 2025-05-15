@@ -50,8 +50,10 @@ export class PaymentService {
       url_success: this.baseFrontendURL,
       url_callback: `${this.baseBackendURL}/api/payment/cryptomus/webhook`,
       is_payment_multiple: false,
+      lifetime: 43200,
       to_currency: 'USDT',
     };
+    console.log(payload);
     try {
       const response = await this.cryptomus.post('/v1/payment', payload, {
         headers: {
@@ -63,6 +65,7 @@ export class PaymentService {
         orderId: response.data.result.order_id,
       };
     } catch (error) {
+      console.log(error.response.data);
       throw new HttpException('Invalid amount or order id', 400);
     }
   }
