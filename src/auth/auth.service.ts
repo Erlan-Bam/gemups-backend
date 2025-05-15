@@ -18,6 +18,10 @@ export class AuthService {
     private emailService: EmailService,
     private configService: ConfigService,
   ) {}
+
+  async addGuest() {
+    return await this.prisma.user.create({ data: {} });
+  }
   async register(data: RegisterDto) {
     let user = await this.userService.findByEmail(data.email);
     if (user) {

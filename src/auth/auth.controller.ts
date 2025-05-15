@@ -30,6 +30,11 @@ export class AuthController {
         : 'https://don-vip.online';
   }
 
+  @Post('guest')
+  async addGuest() {
+    return this.authService.addGuest();
+  }
+
   @Post('login')
   @ApiOperation({ summary: 'Login user with email or phone and password' })
   @ApiBody({ type: LoginDto })
