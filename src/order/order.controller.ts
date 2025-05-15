@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Get,
   Param,
+  ParseUUIDPipe,
   Post,
   Request,
   UseGuards,
@@ -25,7 +27,7 @@ export class OrderController {
   @Post(':userId')
   @ApiOperation({ summary: 'Create a new order for the authorized user' })
   @ApiResponse({ status: 201, description: 'Order created successfully' })
-  async create(@Param('userId') userId: string) {
+  async create(@Param('userId', ParseUUIDPipe) userId: string) {
     return await this.orderService.create(userId);
   }
 
@@ -33,8 +35,16 @@ export class OrderController {
   @ApiOperation({ summary: 'Finish an order by ID for the authorized user' })
   @ApiBody({ type: FinishOrderDto })
   @ApiResponse({ status: 200, description: 'Order finished successfully' })
-  async finish(@Body() data: FinishOrderDto, @Param('userId') userId: string) {
+  async finish(
+    @Body() data: FinishOrderDto,
+    @Param('userId', ParseUUIDPipe) userId: string,
+  ) {
     data.user_id = userId;
     return await this.orderService.finish(data);
+  }
+
+  @Get('history/:userId')
+  async getHistory(@Param('userId', ParseUUIDPipe) userId: string) {
+    return await this.orderService.getHistory(userId);
   }
 }

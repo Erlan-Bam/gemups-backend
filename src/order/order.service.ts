@@ -124,4 +124,11 @@ export class OrderService {
       }
     }
   }
+
+  async getHistory(userId: string) {
+    return await this.prisma.order.findMany({
+      where: { user_id: userId },
+      include: { items: { include: { product: true } } },
+    });
+  }
 }
