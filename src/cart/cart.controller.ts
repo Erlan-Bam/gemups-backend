@@ -4,36 +4,35 @@ import {
   Delete,
   Get,
   Body,
-  UseGuards,
-  Request,
+  Param,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 import { RemoveFromCartDto } from './dto/remove-from-cart.dto';
-import { AuthGuard } from '@nestjs/passport';
+import { ApiBody, ApiOperation } from '@nestjs/swagger';
 
 @Controller('cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
   @Post('add-item')
-  @UseGuards(AuthGuard('jwt'))
-  async addItem(@Body() data: AddToCartDto, @Request() request) {
-    data.user_id = request.user.id;
+  @ApiOperation({ summary: 'Добавить товар в корзину' })
+  @ApiBody({ type: AddToCartDto })
+  async addItem(@Body() data: AddToCartDto) {
     return await this.cartService.addItem(data);
   }
 
   @Delete('remove-item')
-  @UseGuards(AuthGuard('jwt'))
-  async removeItem(@Body() data: RemoveFromCartDto, @Request() request) {
-    data.user_id = request.user.id;
+  @ApiOperation({ summary: 'Удалить товар из корзины' })
+  @ApiBody({ type: RemoveFromCartDto })
+  async removeItem(@Body() data: RemoveFromCartDto) {
     return await this.cartService.removeItem(data);
   }
 
-  @Get()
-  @UseGuards(AuthGuard('jwt'))
-  async getCart(@Request() request) {
-    const userId = request.user.id;
+  @Get(':userId')
+  @ApiOperation({ summary: 'Получить содержимое корзины' })
+  async getCart(@Param('userId', ParseUUIDPipe) userId: string) {
     return await this.cartService.getCart(userId);
   }
 }
