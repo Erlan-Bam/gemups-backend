@@ -135,12 +135,21 @@ export class OrderService {
   async getProxy(itemId: number) {
     const item = await this.prisma.orderItem.findUnique({
       where: { id: itemId },
+      include: {
+        product: true,
+      },
     });
 
     if (!item) {
       throw new HttpException('Order item not found', 404);
     }
 
-    return;
+    if (item.product.provider === 'SevenOneOne') {
+      const data = JSON.parse(item.external_data);
+      const result = await this.sevenOneOne.get(data.order_no);
+      return result;
+    } else {
+      throw new HttpException('Unsupported provider', 400);
+    }
   }
 }

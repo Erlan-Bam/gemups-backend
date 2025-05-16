@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
-import { IsInt, IsOptional, IsPositive, IsUUID } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsInt, IsPositive, IsUUID } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class RemoveFromCartDto {
   @ApiProperty({
