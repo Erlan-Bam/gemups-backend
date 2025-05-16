@@ -51,7 +51,6 @@ export class PaymentService {
       url_callback: `${this.baseBackendURL}/api/payment/cryptomus/webhook`,
       is_payment_multiple: false,
       lifetime: 43200,
-      to_currency: 'USDT',
     };
     console.log(payload);
     try {
