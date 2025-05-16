@@ -26,6 +26,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+
 import { ConfigService } from '@nestjs/config';
 import { AdminGuard } from 'src/shared/guards/admin.guards';
 
@@ -107,7 +108,6 @@ export class UserController {
   }
 
   @Get(':id')
-  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Get user by ID' })
   @ApiParam({
     name: 'id',
