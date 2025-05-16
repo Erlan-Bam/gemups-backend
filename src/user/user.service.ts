@@ -32,11 +32,18 @@ export class UserService {
     return result;
   }
 
-  async findById(id: string): Promise<User> {
-    const user = await this.prisma.user.findUnique({ where: { id: id } });
+  async findById(id: string): Promise<Pick<User, 'balance'>> {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        balance: true,
+      },
+    });
+
     if (!user) {
       throw new HttpException('User not found', 404);
     }
+
     return user;
   }
 
