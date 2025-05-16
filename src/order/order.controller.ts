@@ -3,21 +3,13 @@ import {
   Controller,
   Get,
   Param,
+  ParseIntPipe,
   ParseUUIDPipe,
   Post,
-  Request,
-  UseGuards,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
-import { AuthGuard } from '@nestjs/passport';
 import { FinishOrderDto } from './dto/finish-order-dto';
-import {
-  ApiBearerAuth,
-  ApiBody,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Orders')
 @Controller('order')
@@ -46,5 +38,10 @@ export class OrderController {
   @Get('history/:userId')
   async getHistory(@Param('userId', ParseUUIDPipe) userId: string) {
     return await this.orderService.getHistory(userId);
+  }
+
+  @Get('proxy/:itemId')
+  async getProxy(@Param('itemId', ParseIntPipe) itemId: number) {
+    return await this.orderService.getProxy(itemId);
   }
 }

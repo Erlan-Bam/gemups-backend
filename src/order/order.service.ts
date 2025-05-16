@@ -131,4 +131,16 @@ export class OrderService {
       include: { items: { include: { product: true } } },
     });
   }
+
+  async getProxy(itemId: number) {
+    const item = await this.prisma.orderItem.findUnique({
+      where: { id: itemId },
+    });
+
+    if (!item) {
+      throw new HttpException('Order item not found', 404);
+    }
+
+    return;
+  }
 }
