@@ -10,6 +10,7 @@ import {
 import { OrderService } from './order.service';
 import { FinishOrderDto } from './dto/finish-order-dto';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ProlongProxyDto } from './dto/prolong-proxy.dto';
 
 @ApiTags('Orders')
 @Controller('order')
@@ -43,5 +44,10 @@ export class OrderController {
   @Get('proxy/:itemId')
   async getProxy(@Param('itemId', ParseIntPipe) itemId: number) {
     return await this.orderService.getProxy(itemId);
+  }
+
+  @Post('prolong-proxy')
+  async prolongProxy(@Body() data: ProlongProxyDto) {
+    return await this.orderService.prolongProxy(data);
   }
 }

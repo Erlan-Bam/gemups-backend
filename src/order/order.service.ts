@@ -1,8 +1,9 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/shared/services/prisma.service';
 import { FinishOrderDto } from './dto/finish-order-dto';
-import { OrderStatus, Provider } from '@prisma/client';
+import { OrderItem, OrderStatus, Provider, User } from '@prisma/client';
 import { SevenOneOneService } from 'src/provider/sevenoneone/sevenoneone.service';
+import { ProlongProxyDto } from './dto/prolong-proxy.dto';
 
 @Injectable()
 export class OrderService {
@@ -60,10 +61,6 @@ export class OrderService {
   async finish(data: FinishOrderDto) {
     const user = await this.prisma.user.findUnique({
       where: { id: data.user_id },
-      select: {
-        id: true,
-        balance: true,
-      },
     });
     if (!user) {
       throw new HttpException('User not found', 404);
@@ -93,32 +90,18 @@ export class OrderService {
           traffic: item.product.traffic,
           quantity: item.quantity,
         });
-        if (result.status === 'success') {
-          await this.prisma.$transaction([
-            this.prisma.user.update({
-              where: { id: user.id },
-              data: { balance: { decrement: item.price } },
-            }),
-            this.prisma.orderItem.update({
-              where: { id: item.id },
-              data: {
-                status: OrderStatus.executed,
-                external_data: JSON.stringify({
-                  order_no: result.order_no,
-                  username: result.username,
-                  passwd: result.passwd,
-                }),
-              },
-            }),
-          ]);
-        } else {
-          await this.prisma.orderItem.update({
-            where: {
-              id: item.id,
-            },
-            data: { status: OrderStatus.failed },
-          });
-        }
+        await this.changeBalance(
+          result.status,
+          user,
+          item,
+          result.status === 'success'
+            ? JSON.stringify({
+                order_no: result.order_no,
+                username: result.username,
+                passwd: result.passwd,
+              })
+            : undefined,
+        );
       } else {
         throw new HttpException('Unsupported provider', 400);
       }
@@ -150,6 +133,78 @@ export class OrderService {
       return result;
     } else {
       throw new HttpException('Unsupported provider', 400);
+    }
+  }
+
+  async prolongProxy(dto: ProlongProxyDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: dto.user_id },
+    });
+
+    if (!user) {
+      throw new HttpException('User not found', 404);
+    }
+
+    const item = await this.prisma.orderItem.findUnique({
+      where: { id: dto.item_id },
+      include: {
+        product: true,
+      },
+    });
+
+    if (!item) {
+      throw new HttpException('Order item not found', 404);
+    }
+
+    if (item.product.provider === 'SevenOneOne') {
+      const data = JSON.parse(item.external_data) as {
+        order_no: string;
+        username: string;
+        passwd: string;
+      };
+      const result = await this.sevenOneOne.prolong({
+        period: item.product.period,
+        quantity: item.quantity,
+        traffic: item.product.traffic,
+        username: data.username,
+        passwd: data.passwd,
+      });
+
+      await this.changeBalance(result.status, user, item);
+
+      return result;
+    } else {
+      throw new HttpException('Unsupported provider', 400);
+    }
+  }
+
+  async changeBalance(
+    status: 'success' | 'error',
+    user: User,
+    item: OrderItem,
+    external_data?: string,
+  ) {
+    if (status === 'success') {
+      await this.prisma.$transaction([
+        this.prisma.user.update({
+          where: { id: user.id },
+          data: { balance: { decrement: item.price } },
+        }),
+        this.prisma.orderItem.update({
+          where: { id: item.id },
+          data: {
+            status: OrderStatus.executed,
+            external_data: external_data,
+          },
+        }),
+      ]);
+    } else {
+      await this.prisma.orderItem.update({
+        where: {
+          id: item.id,
+        },
+        data: { status: OrderStatus.failed },
+      });
     }
   }
 }
