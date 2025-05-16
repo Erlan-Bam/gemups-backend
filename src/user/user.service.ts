@@ -32,12 +32,9 @@ export class UserService {
     return result;
   }
 
-  async findById(id: string): Promise<Pick<User, 'balance'>> {
+  async findById(id: string): Promise<User> {
     const user = await this.prisma.user.findUnique({
       where: { id },
-      select: {
-        balance: true,
-      },
     });
 
     if (!user) {

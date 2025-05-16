@@ -26,9 +26,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { UpdateProfileDto } from './dto/update-profile.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { extname } from 'path';
-import { diskStorage } from 'multer';
 import { ConfigService } from '@nestjs/config';
 import { AdminGuard } from 'src/shared/guards/admin.guards';
 
